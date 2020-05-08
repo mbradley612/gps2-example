@@ -16,6 +16,7 @@
  */
 
 #include "mgos.h"
+#include "gps2.h"
 
 static void timer_cb(void *arg) {
   static bool s_tick_tock = false;
@@ -30,7 +31,32 @@ static void timer_cb(void *arg) {
   (void) arg;
 }
 
+static void gps_handler(struct gps2 *gps_dev,
+  int event, void *event_data, void *user_data) {
+
+  }
+
 enum mgos_app_init_result mgos_app_init(void) {
+  struct gps2 *gps_dev = NULL;
+  struct gps2_cfg cfg;
+  
+
+  // create a GPS config
+  gps2_config_set_default(&cfg);
+
+
+  // check these numbers!
+  cfg.uart_baud_rate = 9600;
+  cfg.uart_no = 2;
+  cfg.handler = gps_handler;
+
+  if (NULL == (gps_dev = gps2_create_uart(&cfg))) {
+    LOG(LL_ERROR,("Did not connect to GPS"));
+    return false;
+  }
+
+
+  // default flashing LED behaviour
 #ifdef LED_PIN
   mgos_gpio_setup_output(LED_PIN, 0);
 #endif
