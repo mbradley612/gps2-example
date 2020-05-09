@@ -52,7 +52,7 @@ enum mgos_app_init_result mgos_app_init(void) {
 
   if (NULL == (gps_dev = gps2_create_uart(&cfg))) {
     LOG(LL_ERROR,("Did not connect to GPS"));
-    return false;
+    return MGOS_APP_INIT_ERROR;
   }
 
 
