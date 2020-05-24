@@ -34,6 +34,11 @@ static void timer_cb(void *arg) {
 static void gps_handler(struct gps2 *gps_dev,
   int event, void *event_data, void *user_data) {
 
+    switch (event) {
+      case GPS_EV_INITIALIZED:
+        LOG(LL_INFO,("GPS Initialized event received"));
+    }
+
   }
 
 enum mgos_app_init_result mgos_app_init(void) {

@@ -4,5 +4,6 @@
         "${workspaceFolder}/**",
         
         ],
-        "mos.port": ""
+        "mos.port": "",
+        "mos.board": "ESP32"
 }

@@ -42,8 +42,8 @@ filesystem:
 # settings that has been created by other libraries. For example, debug log
 # level is 2 by default. For this firmware we can override it to 3:
 #
-# config_schema:
-#  - ["debug.level", 3]
+config_schema:
+  - ["debug.level", 3]
 
 libs:
   - origin: https://github.com/mongoose-os-libs/boards
