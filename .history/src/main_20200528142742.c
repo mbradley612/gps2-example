@@ -17,7 +17,7 @@
 
 #include "mgos.h"
 #include "gps2.h"
-#include <inttypes.h>
+#include "inttypes.h"
 
 
 static void timer_cb(void *arg) {
@@ -46,7 +46,7 @@ static void gps_handler(struct gps2 *gps_dev,
         int64_t age;
         
         gps2_get_position(gps_dev, &lat, &lon, &age);
-        LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", lon, lat, age));
+        LOG(LL_INFO,("Lon: %f, Lat %f, Age " PRId64 "", lon, lat, age));
         int day,month,year,hours, minutes, seconds,microseconds;
         gps2_get_datetime(gps_dev,&day,&month,&year,&hours,&minutes,&seconds,&microseconds,&age);
         LOG(LL_INFO,("Time is: %02d:%02d:%02d",hours,minutes,seconds));

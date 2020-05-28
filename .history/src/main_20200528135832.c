@@ -17,8 +17,6 @@
 
 #include "mgos.h"
 #include "gps2.h"
-#include <inttypes.h>
-
 
 static void timer_cb(void *arg) {
   static bool s_tick_tock = false;
@@ -41,12 +39,12 @@ static void gps_handler(struct gps2 *gps_dev,
         LOG(LL_INFO,("GPS Initialized event received"));
       } break;
       case GPS_EV_LOCATION_UPDATE: {
-        float lat;
-        float lon;
-        int64_t age;
+        unsigned float lat;
+        unsigned float lon;
+        unsigned long age;
         
         gps2_get_position(gps_dev, &lat, &lon, &age);
-        LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", lon, lat, age));
+        LOG(LL_INFO,("Lon: %lu, Lat %lu, Age %lu", lon, lat, age));
         int day,month,year,hours, minutes, seconds,microseconds;
         gps2_get_datetime(gps_dev,&day,&month,&year,&hours,&minutes,&seconds,&microseconds,&age);
         LOG(LL_INFO,("Time is: %02d:%02d:%02d",hours,minutes,seconds));
