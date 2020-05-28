@@ -42,20 +42,11 @@ static void gps_handler(struct gps2 *gps_dev,
         unsigned long lat;
         unsigned long lon;
         unsigned long age;
-        
         gps2_get_position(gps_dev, &lat, &lon, &age);
-        LOG(LL_INFO,("Lon: %lu, Lat %lu, Age %lu", lon, lat, age));
-        int day,month,year,hours, minutes, seconds,microseconds;
-        gps2_get_datetime(gps_dev,&day,&month,&year,&hours,&minutes,&seconds,&microseconds,&age);
-        LOG(LL_INFO,("Time is: %02d:%02d:%02d",hours,minutes,seconds));
-
+        LOG(LL_DEBUG,("Lon: %lu, Lat %lu, Age %lu", lon, lat, age));
       } break;
       case GPS_EV_FIX_ACQUIRED: {
           LOG(LL_INFO,("GPS fix acquired"));
-       
-      } break;
-      case GPS_EV_FIX_LOST: {
-          LOG(LL_INFO,("GPS fix lost"));
        
       } break;
     }

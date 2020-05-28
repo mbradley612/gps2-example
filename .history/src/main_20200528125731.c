@@ -44,10 +44,10 @@ static void gps_handler(struct gps2 *gps_dev,
         unsigned long age;
         
         gps2_get_position(gps_dev, &lat, &lon, &age);
-        LOG(LL_INFO,("Lon: %lu, Lat %lu, Age %lu", lon, lat, age));
-        int day,month,year,hours, minutes, seconds,microseconds;
-        gps2_get_datetime(gps_dev,&day,&month,&year,&hours,&minutes,&seconds,&microseconds,&age);
-        LOG(LL_INFO,("Time is: %02d:%02d:%02d",hours,minutes,seconds));
+        LOG(LL_DEBUG,("Lon: %lu, Lat %lu, Age %lu", lon, lat, age));
+        int hours, minutes, seconds,microseconds;
+        gps2_get_datetime(gps_dev,&hours,&minutes,&seconds,&microseconds,&age);
+        LOG(LL_DEBUG,("Time is: %02d:%02d:%02d",hours,minutes,seconds));
 
       } break;
       case GPS_EV_FIX_ACQUIRED: {

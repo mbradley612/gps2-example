@@ -35,29 +35,14 @@ static void gps_handler(struct gps2 *gps_dev,
   int event, void *event_data, void *user_data) {
 
     switch (event) {
-      case GPS_EV_INITIALIZED: {
+      case GPS_EV_INITIALIZED:
         LOG(LL_INFO,("GPS Initialized event received"));
-      } break;
-      case GPS_EV_LOCATION_UPDATE: {
-        unsigned long lat;
+      case GPS_EV_LOCATION_UPDATE:
         unsigned long lon;
+        unsigned long lat;
         unsigned long age;
-        
-        gps2_get_position(gps_dev, &lat, &lon, &age);
-        LOG(LL_INFO,("Lon: %lu, Lat %lu, Age %lu", lon, lat, age));
-        int day,month,year,hours, minutes, seconds,microseconds;
-        gps2_get_datetime(gps_dev,&day,&month,&year,&hours,&minutes,&seconds,&microseconds,&age);
-        LOG(LL_INFO,("Time is: %02d:%02d:%02d",hours,minutes,seconds));
-
-      } break;
-      case GPS_EV_FIX_ACQUIRED: {
-          LOG(LL_INFO,("GPS fix acquired"));
-       
-      } break;
-      case GPS_EV_FIX_LOST: {
-          LOG(LL_INFO,("GPS fix lost"));
-       
-      } break;
+        gps2_get_position(gps_dev, lon, lat, age);
+        LOG(LL_DEBUG,("Lon: %d, Lat %d, Age %d", lon, late, age))
     }
 
   }
