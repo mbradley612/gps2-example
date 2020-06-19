@@ -82,11 +82,9 @@ enum mgos_app_init_result mgos_app_init(void) {
 
 
   /*
-  * UART 1.
-  * RX pin 13
-  * TX pin 14
+  * UART 1, 
   */
-  cfg.uart_no = 2;
+  cfg.uart_no = 1;
   cfg.handler = gps_handler;
   
 

@@ -1,6 +1,6 @@
 {
     "C_Cpp.default.includePath": [
-        "/home/matthew/git/gps2/include",
+        "/home/matthew/git/mos/gps2/include",
         "${workspaceFolder}/**",
         
         ],

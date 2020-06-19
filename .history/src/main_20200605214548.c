@@ -72,20 +72,9 @@ enum mgos_app_init_result mgos_app_init(void) {
   // create a GPS config
   gps2_config_set_default(&cfg);
 
-  /*
-  * change this to pass the mgos_uart_config to the gps module.
-  */
-
 
   // check these numbers!
   cfg.uart_baud_rate = 9600;
-
-
-  /*
-  * UART 1.
-  * RX pin 13
-  * TX pin 14
-  */
   cfg.uart_no = 2;
   cfg.handler = gps_handler;
   

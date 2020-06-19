@@ -46,7 +46,7 @@ filesystem:
 # For LL_INFO set debug.level to 2
 #
 config_schema:
-  - ["debug.level", 3]
+  - ["debug.level", 2]
 
 libs:
   - origin: https://github.com/mongoose-os-libs/boards
