@@ -65,20 +65,16 @@ static void gps_handler(struct gps2 *gps_dev,
   }
 
 enum mgos_app_init_result mgos_app_init(void) {
-  
  
-  /*
   
   if (NULL == gps2_get_global_device()) {
     LOG(LL_ERROR,("Did not connect to GPS"));
     return MGOS_APP_INIT_ERROR;
   }
-  */
-
 
     /*
    gps2_set_ev_handler(gps_handler,NULL);
-  
+  */
 
   // default flashing LED behaviour
 #ifdef LED_PIN

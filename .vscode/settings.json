@@ -1,9 +1,9 @@
 {
+
     "C_Cpp.default.includePath": [
-        "/home/matthew/git/mos/gps2/include",
-        "${workspaceFolder}/**",
-        
-        ],
-        "mos.port": "",
-        "mos.board": "ESP32"
+        "/home/matthew/git/mos/gps2/include/*",
+        "${workspaceFolder}/build/**"],
+
+    "mos.port": "",
+    "mos.board": "ESP32"
 }

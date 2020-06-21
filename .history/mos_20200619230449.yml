@@ -47,7 +47,7 @@ filesystem:
 #
 config_schema:
   - ["debug.level", 3]
-  - ["gps.uart.no", 2]
+  - ["gps.uart_no", 2]
 
 libs:
   - origin: https://github.com/mongoose-os-libs/boards

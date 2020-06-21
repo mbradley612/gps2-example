@@ -45,10 +45,10 @@ static void gps_handler(struct gps2 *gps_dev,
         struct gps2_datetime datetime;
         int64_t age;
         
-        gps2_get_location(&location, &age);
+        gps2_global_get_location(&location, &age);
         LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", location.longitude, location.latitude, age));
         
-        gps2_get_datetime(&datetime,&age);
+        gps2_global_get_datetime(&datetime,&age);
         LOG(LL_INFO,("Time is: %02d:%02d:%02d",datetime.hours,datetime.minutes,datetime.seconds));
 
       } break;
@@ -65,20 +65,15 @@ static void gps_handler(struct gps2 *gps_dev,
   }
 
 enum mgos_app_init_result mgos_app_init(void) {
-  
  
-  /*
   
   if (NULL == gps2_get_global_device()) {
     LOG(LL_ERROR,("Did not connect to GPS"));
     return MGOS_APP_INIT_ERROR;
   }
-  */
 
+  void gps2_set_ev_handler(gps_handler, 0);
 
-    /*
-   gps2_set_ev_handler(gps_handler,NULL);
-  
 
   // default flashing LED behaviour
 #ifdef LED_PIN
