@@ -1,9 +1,7 @@
-{
-
-    "C_Cpp.default.includePath": [
-        "/home/matthew/git/mos/gps2/include/*",
-        "${workspaceFolder}/build/**"],
-
-    "mos.port": "",
-    "mos.board": "ESP32"
-}
+[{
+	"C_Cpp.intelliSenseEngineFallback": "Enabled",
+	"files.associations": {
+		"mgos.h": "c"
+	},
+	"C_Cpp.intelliSenseEngine": "Tag Parser"
+}]

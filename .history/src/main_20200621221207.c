@@ -21,10 +21,6 @@
 
 #define UART_NO 2
 
-/*
-* comment this out if you don't want the global GPS device
-*/
-#define GPS_GLOBAL_DEVICE
 
 static void timer_cb(void *arg) {
   static bool s_tick_tock = false;
@@ -70,44 +66,7 @@ static void gps_handler(struct gps2 *gps_dev,
 
   }
 
-/*
-* Initializing the global GPS device is all through config. The only mandatory settings are  the
-* UART number and baud rate. For the others you can rely on the defaults:
-*
-* config_schema:
-  - ["gps.uart.no", 2]
-  - ["gps.uart.baud", 9600]
-*/
-int init_global_gps_device(void) {
-
-  /*
-  * Check that the device got created.
-  */
-  if (gps2_get_global_device() ==NULL) {
-
-    
-    return false;
-  }
-
-  /*
-  * Set our event handler. 
-  */
-
-  gps2_set_ev_handler(gps_handler,NULL);
-
-  return true;
-  
-}
-
-/*
-* To initialize a GPS that is not the global device, create and configure an
-* mgos_uart_config
-*/
-
-
-int init_gps_device(void) {
-
-
+enum mgos_app_init_result mgos_app_init(void) {
   struct mgos_uart_config ucfg;
   struct gps2 *device;
 
@@ -117,41 +76,33 @@ int init_gps_device(void) {
   ucfg.num_data_bits = 8;
   ucfg.parity = MGOS_UART_PARITY_NONE;
   ucfg.stop_bits = MGOS_UART_STOP_BITS_1;
-  ucfg.tx_buf_size = 512; 
-  ucfg.rx_buf_size = 128; 
-  ucfg.baud_rate=9600;
+  ucfg.tx_buf_size = 512; /*mgos_sys_config_get_gps_uart_tx_buffer_size();*/
+  ucfg.rx_buf_size = 128; /*mgos_sys_config_get_gps_uart_rx_buffer_size();*/
+  ucfg.uart_baud_rate = 9600;
 
-  device = gps2_create_uart(UART_NO, &ucfg, gps_handler, NULL);
+  device = gps2_create_uart_device(UART_NO, &ucfg, NULL, NULL);
 
   if (device ==NULL) {
 
-    
-    return false;
-  } else {
-    return true;
+    gps2_set_device_event_handler(gps_handler,NULL);
+    return MGOS_APP_INIT_ERROR;
   }
-
-}  
-
-enum mgos_app_init_result mgos_app_init(void) {
-
-  int gps_init;
-
-  #ifdef GPS_GLOBAL_DEVICE
-  gps_init = init_global_gps_device();
-  #else
-  gps_init = init_gps_device();
-  #endif
-
-  if (gps_init == false) {
-    return MGOS_INIT_APP_INIT_FAILED;
+  
+ 
+  /*
+  
+  if (NULL == gps2_get_global_device()) {
+    LOG(LL_ERROR,("Did not connect to GPS"));
+    return MGOS_APP_INIT_ERROR;
   }
+  */
 
 
-    // default flashing LED behaviour
-  #ifdef LED_PIN
-    mgos_gpio_setup_output(LED_PIN, 0);
-  #endif
-    mgos_set_timer(1000 /* ms */, MGOS_TIMER_REPEAT, timer_cb, NULL);
-    return MGOS_APP_INIT_SUCCESS;
+
+  // default flashing LED behaviour
+#ifdef LED_PIN
+  mgos_gpio_setup_output(LED_PIN, 0);
+#endif
+  mgos_set_timer(1000 /* ms */, MGOS_TIMER_REPEAT, timer_cb, NULL);
+  return MGOS_APP_INIT_SUCCESS;
 }

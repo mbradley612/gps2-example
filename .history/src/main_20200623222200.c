@@ -22,7 +22,7 @@
 #define UART_NO 2
 
 /*
-* comment this out if you don't want the global GPS device
+*
 */
 #define GPS_GLOBAL_DEVICE
 

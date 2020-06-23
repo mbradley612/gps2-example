@@ -21,9 +21,6 @@
 
 #define UART_NO 2
 
-/*
-* comment this out if you don't want the global GPS device
-*/
 #define GPS_GLOBAL_DEVICE
 
 static void timer_cb(void *arg) {
