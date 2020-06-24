@@ -19,6 +19,12 @@
 #include "gps2.h"
 #include <inttypes.h>
 
+#define UART_NO 2
+
+/*
+* comment this out if you don't want the global GPS device
+*/
+#define GPS_GLOBAL_DEVICE
 
 static void timer_cb(void *arg) {
   static bool s_tick_tock = false;
@@ -41,15 +47,15 @@ static void gps_handler(struct gps2 *gps_dev,
         LOG(LL_INFO,("GPS Initialized event received"));
       } break;
       case GPS_EV_LOCATION_UPDATE: {
-        float lat;
-        float lon;
+        struct gps2_location location;
+        struct gps2_datetime datetime;
         int64_t age;
         
-        gps2_get_position(gps_dev, &lat, &lon, &age);
-        LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", lon, lat, age));
-        int day,month,year,hours, minutes, seconds,microseconds;
-        gps2_get_datetime(gps_dev,&day,&month,&year,&hours,&minutes,&seconds,&microseconds,&age);
-        LOG(LL_INFO,("Time is: %02d:%02d:%02d",hours,minutes,seconds));
+        gps2_get_location(&location, &age);
+        LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", location.longitude, location.latitude, age));
+        
+        gps2_get_datetime(&datetime,&age);
+        LOG(LL_INFO,("Time is: %02d:%02d:%02d",datetime.hours,datetime.minutes,datetime.seconds));
 
       } break;
       case GPS_EV_FIX_ACQUIRED: {
@@ -64,42 +70,88 @@ static void gps_handler(struct gps2 *gps_dev,
 
   }
 
+/*
+* Initializing the global GPS device is all through config. The only mandatory settings are  the
+* UART number and baud rate. For the others you can rely on the defaults:
+*
+* config_schema:
+  - ["gps.uart.no", 2]
+  - ["gps.uart.baud", 9600]
+*/
+int init_global_gps_device(void) {
+
+  /*
+  * Check that the device got created.
+  */
+  if (gps2_get_global_device() ==NULL) {
+
+    
+    return false;
+  }
+
+  /*
+  * Set our event handler. 
+  */
+
+  gps2_set_ev_handler(gps_handler,NULL);
+
+  return true;
+  
+}
+
+/*
+* To initialize a GPS that is not the global device, create and configure an
+* mgos_uart_config
+*/
+
+
+int init_gps_device(void) {
+
+
+  struct mgos_uart_config ucfg;
+  struct gps2 *device;
+
+  mgos_uart_config_set_defaults(UART_NO,&ucfg);
+  
+
+  ucfg.num_data_bits = 8;
+  ucfg.parity = MGOS_UART_PARITY_NONE;
+  ucfg.stop_bits = MGOS_UART_STOP_BITS_1;
+  ucfg.tx_buf_size = 512; 
+  ucfg.rx_buf_size = 128; 
+  ucfg.baud_rate=9600;
+
+  device = gps2_create_uart(UART_NO, &ucfg, gps_handler, NULL);
+
+  if (device ==NULL) {
+
+    
+    return false;
+  } else {
+    return true;
+  }
+
+}  
+
 enum mgos_app_init_result mgos_app_init(void) {
-  struct gps2 *gps_dev = NULL;
-  struct gps2_cfg cfg;
-  
 
-  // create a GPS config
-  gps2_config_set_default(&cfg);
+  int gps_init;
 
-  /*
-  * change this to pass the mgos_uart_config to the gps module.
-  */
+  #ifdef GPS_GLOBAL_DEVICE
+  gps_init = init_global_gps_device();
+  #else
+  gps_init = init_gps_device();
+  #endif
 
-
-  // check these numbers!
-  cfg.uart_baud_rate = 9600;
-
-
-  /*
-  * UART 1.
-  * RX pin 13
-  * TX pin 14
-  */
-  cfg.uart_no = 2;
-  cfg.handler = gps_handler;
-  
-
-  if (NULL == (gps_dev = gps2_create_uart(&cfg))) {
-    LOG(LL_ERROR,("Did not connect to GPS"));
-    return MGOS_APP_INIT_ERROR;
+  if (gps_init == false) {
+    return MGOS_INIT_APP_INIT_FAILED;
   }
 
 
-  // default flashing LED behaviour
-#ifdef LED_PIN
-  mgos_gpio_setup_output(LED_PIN, 0);
-#endif
-  mgos_set_timer(1000 /* ms */, MGOS_TIMER_REPEAT, timer_cb, NULL);
-  return MGOS_APP_INIT_SUCCESS;
+    // default flashing LED behaviour
+  #ifdef LED_PIN
+    mgos_gpio_setup_output(LED_PIN, 0);
+  #endif
+    mgos_set_timer(1000 /* ms */, MGOS_TIMER_REPEAT, timer_cb, NULL);
+    return MGOS_APP_INIT_SUCCESS;
 }

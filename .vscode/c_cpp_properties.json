@@ -1,4 +1,8 @@
 {
-  "configurations": [],
-  "version": 4
+	"includePath": [
+		"${workspaceFolder}/**",
+		"/home/matthew/git/mongoose-os/",
+		"/home/matthew/git/gps2/include/"
+	
+	]
 }
