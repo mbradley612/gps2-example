@@ -17,9 +17,11 @@
 
 #include "mgos.h"
 #include "gps2.h"
+#include "pmtk.h"
 #include <inttypes.h>
 
 #define UART_NO 2
+#define PMKT 1
 
 /*
 * comment this out if you don't want the global GPS device
@@ -38,6 +40,11 @@ static void timer_cb(void *arg) {
 #endif
   (void) arg;
 }
+
+static void send_10hz_command(void) {
+  gps2_send_pmtk_command(mg_mk_str(PMTK_API_SET_FIX_CTL_5HZ));
+
+} 
 
 static void gps_handler(struct gps2 *gps_dev,
   int event, void *event_data, void *user_data) {
@@ -64,6 +71,15 @@ static void gps_handler(struct gps2 *gps_dev,
       } break;
       case GPS_EV_FIX_LOST: {
           LOG(LL_INFO,("GPS fix lost"));
+      } break;
+      case GPS_EV_CONNECTED: {
+          LOG(LL_INFO,("GPS connected"));
+          send_10hz_command();
+
+
+
+      /* add something for PMKT command acknowleged. The event should be defined in the pmkt.h header
+       file to avoid polluting the gps2.h header file */
        
       } break;
     }
