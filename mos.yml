@@ -46,7 +46,7 @@ filesystem:
 # For LL_INFO set debug.level to 2
 #
 config_schema:
-  - ["debug.level", 3]
+  - ["debug.level", 2]
   - ["gps.uart.no", 2]
   - ["gps.uart.baud", 9600]
 
@@ -57,6 +57,8 @@ libs:
   - origin: https://github.com/mongoose-os-libs/rpc-service-fs
   - origin: https://github.com/mongoose-os-libs/rpc-uart
   - origin: /home/matthew/git/mos/gps2
+
+
 
 
 # Used by the mos tool to catch mos binaries incompatible with this file format

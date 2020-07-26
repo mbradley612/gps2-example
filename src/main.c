@@ -17,11 +17,39 @@
 
 #include "mgos.h"
 #include "gps2.h"
-#include "pmtk.h"
+
 #include <inttypes.h>
 
 #define UART_NO 2
 #define PMKT 1
+
+
+/**
+ Different commands to set the update rate from once a second (1 Hz) to 10 times
+ a second (10Hz) Note that these only control the rate at which the position is
+ echoed, to actually speed up the position fix you must also send one of the
+ position fix rate commands below too. */
+#define PMTK_SET_NMEA_UPDATE_100_MILLIHERTZ                                    \
+  "$PMTK220,10000*2F" ///< Once every 10 seconds, 100 millihertz.
+#define PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ                                    \
+  "$PMTK220,5000*1B" ///< Once every 5 seconds, 200 millihertz.
+#define PMTK_SET_NMEA_UPDATE_1HZ "$PMTK220,1000*1F" ///<  1 Hz
+#define PMTK_SET_NMEA_UPDATE_2HZ "$PMTK220,500*2B"  ///<  2 Hz
+#define PMTK_SET_NMEA_UPDATE_5HZ "$PMTK220,200*2C"  ///<  5 Hz
+#define PMTK_SET_NMEA_UPDATE_10HZ "$PMTK220,100*2F" ///< 10 Hz
+// Position fix update rate commands.
+#define PMTK_API_SET_FIX_CTL_100_MILLIHERTZ                                    \
+  "$PMTK300,10000,0,0,0,0*2C" ///< Once every 10 seconds, 100 millihertz.
+#define PMTK_API_SET_FIX_CTL_200_MILLIHERTZ                                    \
+  "$PMTK300,5000,0,0,0,0*18" ///< Once every 5 seconds, 200 millihertz.
+#define PMTK_API_SET_FIX_CTL_1HZ "$PMTK300,1000,0,0,0,0*1C" ///< 1 Hz
+#define PMTK_API_SET_FIX_CTL_5HZ "$PMTK300,200,0,0,0,0*2F"  ///< 5 Hz
+// Can't fix position faster than 5 times a second!
+
+#define PMTK_SET_BAUD_115200 "$PMTK251,115200*1F" ///< 115200 bps
+#define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C"   ///<  57600 bps
+#define PMTK_SET_BAUD_9600 "$PMTK251,9600*17"     ///<   9600 bps
+
 
 /*
 * comment this out if you don't want the global GPS device
@@ -42,7 +70,7 @@ static void timer_cb(void *arg) {
 }
 
 static void send_10hz_command(void) {
-  gps2_send_pmtk_command(mg_mk_str(PMTK_API_SET_FIX_CTL_5HZ));
+  gps2_send_command(mg_mk_str(PMTK_API_SET_FIX_CTL_5HZ));
 
 } 
 
@@ -86,6 +114,19 @@ static void gps_handler(struct gps2 *gps_dev,
 
   }
 
+void proprietary_sentence_handler(struct mg_str line, struct gps2 *gps_dev) {
+  LOG(LL_DEBUG,("In proprietary sentence handler"));
+
+  struct mg_str line_buffer;
+  struct mg_str line_buffer_nul;
+
+  line_buffer = mg_mk_str_n(line.p,line.len);
+
+  line_buffer_nul = mg_strdup_nul(line_buffer);
+
+  LOG(LL_INFO,("Proprietary sentence is: %s",line_buffer_nul.p));
+}
+
 /*
 * Initializing the global GPS device is all through config. The only mandatory settings are  the
 * UART number and baud rate. For the others you can rely on the defaults:
@@ -110,6 +151,7 @@ int init_global_gps_device(void) {
   */
 
   gps2_set_ev_handler(gps_handler,NULL);
+  gps2_set_proprietary_sentence_parser(proprietary_sentence_handler);
 
   return true;
   
@@ -143,9 +185,11 @@ int init_gps_device(void) {
 
     
     return false;
-  } else {
-    return true;
   }
+
+  gps2_set_proprietary_sentence_parser(proprietary_sentence_handler);
+  return true;
+  
 
 }  
 
@@ -158,6 +202,8 @@ enum mgos_app_init_result mgos_app_init(void) {
   #else
   gps_init = init_gps_device();
   #endif
+
+
 
   if (gps_init == false) {
     return MGOS_INIT_APP_INIT_FAILED;
