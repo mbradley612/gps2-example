@@ -56,6 +56,14 @@
 */
 #define GPS_GLOBAL_DEVICE
 
+// have we sent the 10hz command
+bool hasSent10hz = false;
+
+// have we changed the baud rate
+bool hasChangedBaudRate = false;
+
+
+
 static void timer_cb(void *arg) {
   static bool s_tick_tock = false;
   LOG(LL_INFO,
@@ -69,8 +77,14 @@ static void timer_cb(void *arg) {
   (void) arg;
 }
 
-static void send_10hz_command(void) {
+static void send_5hz_command(void) {
+  LOG(LL_INFO,("Sending 5HZ fix command"));
   gps2_send_command(mg_mk_str(PMTK_API_SET_FIX_CTL_5HZ));
+
+} 
+static void send_57600_baud_command(void) {
+  LOG(LL_INFO,("Sending 57600 baud command"));
+  gps2_send_command(mg_mk_str(PMTK_SET_BAUD_57600));
 
 } 
 
@@ -102,14 +116,27 @@ static void gps_handler(struct gps2 *gps_dev,
       } break;
       case GPS_EV_CONNECTED: {
           LOG(LL_INFO,("GPS connected"));
-          send_10hz_command();
-
-
-
-      /* add something for PMKT command acknowleged. The event should be defined in the pmkt.h header
-       file to avoid polluting the gps2.h header file */
-       
+          if (!hasSent10hz)
+          
+            send_5hz_command();
+            hasSent10hz = true;
+            
+          if (!hasChangedBaudRate) {
+            /*
+            send_57600_baud_command();
+            gps2_set_uart_baud(57600);
+            hasChangedBaudRate = true;
+            */
+          }
       } break;
+      case GPS_EV_TIMEDOUT: {
+        LOG(LL_INFO,("GPS device timeout"));
+        /* we need some logic to handle cycling through UART baude rates if we either don't
+        get a connect at startup or we get a timeout */
+      } break;
+
+
+       
     }
 
   }
@@ -142,7 +169,6 @@ int init_global_gps_device(void) {
   */
   if (gps2_get_global_device() ==NULL) {
 
-    
     return false;
   }
 
@@ -152,6 +178,7 @@ int init_global_gps_device(void) {
 
   gps2_set_ev_handler(gps_handler,NULL);
   gps2_set_proprietary_sentence_parser(proprietary_sentence_handler);
+  gps2_enable_disconnect_timer(1000);
 
   return true;
   
@@ -188,6 +215,7 @@ int init_gps_device(void) {
   }
 
   gps2_set_proprietary_sentence_parser(proprietary_sentence_handler);
+  gps2_enable_disconnect_timer(1000);
   return true;
   
 
