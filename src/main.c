@@ -116,27 +116,16 @@ static void gps_handler(struct gps2 *gps_dev,
       } break;
       case GPS_EV_CONNECTED: {
           LOG(LL_INFO,("GPS connected"));
-            
-          if (!hasChangedBaudRate) {
-
-            LOG(LL_INFO,("Sending change baud command to GPS"));
-            
-            send_57600_baud_command();
-
-            LOG(LL_INFO,("Sending change baud to ESP32"));
-            gps2_set_uart_baud(57600);
-            hasChangedBaudRate = true;
-            
-          } else {
-            if (!hasSent10hz) {
+    
+          if (!hasSent10hz) {
 
 
-              LOG(LL_INFO,("Sending 5Hz command to ESP32"));
-            
-              send_5hz_command();
-              hasSent10hz = true;
-            }
+            LOG(LL_INFO,("Sending 5Hz command to ESP32"));
+          
+            send_5hz_command();
+            hasSent10hz = true;
           }
+        
       } break;
       case GPS_EV_TIMEDOUT: {
         LOG(LL_INFO,("GPS device timeout"));
@@ -187,7 +176,19 @@ int init_global_gps_device(void) {
 
   gps2_set_ev_handler(gps_handler,NULL);
   gps2_set_proprietary_sentence_parser(proprietary_sentence_handler);
+  
+  LOG(LL_INFO,("Sending change baud command to GPS"));
+  
+  send_57600_baud_command();
+
+  LOG(LL_INFO,("Sending change baud to ESP32"));
+  gps2_set_uart_baud(57600);
+  hasChangedBaudRate = true;
+  
+  
   gps2_enable_disconnect_timer(1000);
+
+
 
   return true;
   
@@ -223,8 +224,8 @@ int init_gps_device(void) {
     return false;
   }
 
-  gps2_set_proprietary_sentence_parser(proprietary_sentence_handler);
-  gps2_enable_disconnect_timer(1000);
+  gps2_set_device_proprietary_sentence_parser(device, proprietary_sentence_handler);
+  gps2_enable_device_disconnect_timer(device, 1000);
   return true;
   
 
