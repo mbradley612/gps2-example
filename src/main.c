@@ -186,8 +186,6 @@ int init_global_gps_device(void) {
   hasChangedBaudRate = true;
   
   
-  gps2_enable_disconnect_timer(1000);
-
 
 
   return true;
