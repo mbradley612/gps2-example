@@ -116,17 +116,26 @@ static void gps_handler(struct gps2 *gps_dev,
       } break;
       case GPS_EV_CONNECTED: {
           LOG(LL_INFO,("GPS connected"));
-          if (!hasSent10hz)
-          
-            send_5hz_command();
-            hasSent10hz = true;
             
           if (!hasChangedBaudRate) {
-            /*
+
+            LOG(LL_INFO,("Sending change baud command to GPS"));
+            
             send_57600_baud_command();
+
+            LOG(LL_INFO,("Sending change baud to ESP32"));
             gps2_set_uart_baud(57600);
             hasChangedBaudRate = true;
-            */
+            
+          } else {
+            if (!hasSent10hz) {
+
+
+              LOG(LL_INFO,("Sending 5Hz command to ESP32"));
+            
+              send_5hz_command();
+              hasSent10hz = true;
+            }
           }
       } break;
       case GPS_EV_TIMEDOUT: {
