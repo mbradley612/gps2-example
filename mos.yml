@@ -49,6 +49,7 @@ config_schema:
   - ["debug.level", 2]
   - ["gps.uart.no", 2]
   - ["gps.uart.baud", 9600]
+  - ["gps.uart.disconnect_timeout", 1000]
 
 libs:
   - origin: https://github.com/mongoose-os-libs/boards
