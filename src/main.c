@@ -95,16 +95,23 @@ static void gps_handler(struct gps2 *gps_dev,
       case GPS_EV_INITIALIZED: {
         LOG(LL_INFO,("GPS Initialized event received"));
       } break;
-      case GPS_EV_LOCATION_UPDATE: {
-        struct gps2_location location;
-        struct gps2_datetime datetime;
+      case GPS_EV_RMC: {
+        struct gps2_rmc rmc;
         int64_t age;
         
-        gps2_get_location(&location, &age);
-        LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", location.longitude, location.latitude, age));
+        gps2_get_latest_rmc(&rmc, &age);
+        LOG(LL_INFO,("Lon: %f, Lat %f, Age %"PRId64 "", rmc.longitude, rmc.latitude, age));
         
-        gps2_get_datetime(&datetime,&age);
-        LOG(LL_INFO,("Time is: %02d:%02d:%02d",datetime.hours,datetime.minutes,datetime.seconds));
+        LOG(LL_INFO,("Time is: %02d:%02d:%02d",rmc.datetime.hours,rmc.datetime.minutes,rmc.datetime.seconds));
+
+      } break;
+      case GPS_EV_GGA: {
+        struct gps2_gga gga;
+        int64_t age;
+
+        gps2_get_latest_gga(&gga, &age);
+        LOG(LL_INFO,("Number of satellites: %i, fix quality %i", gga.satellites_tracked, gga.fix_quality));
+
 
       } break;
       case GPS_EV_FIX_ACQUIRED: {
@@ -250,6 +257,6 @@ enum mgos_app_init_result mgos_app_init(void) {
   #ifdef LED_PIN
     mgos_gpio_setup_output(LED_PIN, 0);
   #endif
-    mgos_set_timer(1000 /* ms */, MGOS_TIMER_REPEAT, timer_cb, NULL);
+    mgos_set_timer(10000 /* ms */, MGOS_TIMER_REPEAT, timer_cb, NULL);
     return MGOS_APP_INIT_SUCCESS;
 }
