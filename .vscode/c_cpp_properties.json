@@ -1,8 +1,18 @@
 {
-	"includePath": [
-		"${workspaceFolder}/**",
-		"/home/matthew/git/mongoose-os/",
-		"/home/matthew/git/gps2/include/"
-	
-	]
+    "configurations": [
+		
+        {
+			"name":"linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/matthew/git/mongoose-os/",
+                "/home/matthew/git/mos/gps2/include/"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
 }
